@@ -5,7 +5,7 @@ import IconButton from "@mui/material/IconButton";
 import SendIcon from "@mui/icons-material/Send";
 import { useContext } from 'react';
 import { GameHubContext } from './GameHubContext.js';
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 function CommandInput() {
   const gameHubContext = useContext(GameHubContext);

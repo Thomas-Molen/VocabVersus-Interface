@@ -1,6 +1,7 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { HubConnectionBuilder, LogLevel, HubConnection, HubConnectionState } from '@microsoft/signalr';
+import { useNavigate } from "react-router-dom"
 import { GameHubContext } from './GameHubContext.js';
 
 type GameHubProps = {
@@ -20,9 +21,11 @@ function GameHubConnection({ children }: GameHubProps) {
             .build(),
     };
 
+    const navigate = useNavigate();
     function ConnectionFailed()
     {
-        console.log("Connection to game failed");
+        // If connection fails, redirect to origin
+        navigate("/", {replace: true});
     }
 
     useEffect(() => {

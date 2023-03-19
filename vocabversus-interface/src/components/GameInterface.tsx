@@ -1,5 +1,4 @@
 import Title from "./Title";
-import GameHubConnection from "./GameHubConnection";
 import CommandInput from "./CommandInput";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
