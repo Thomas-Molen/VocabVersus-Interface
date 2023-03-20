@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useEffect } from "react";
 import { HubConnectionBuilder, LogLevel, HubConnection, HubConnectionState } from '@microsoft/signalr';
 import { useNavigate } from "react-router-dom"
 import { GameHubContext } from './GameHubContext.js';
+import { PreLoaderContext } from "./PreLoaderContext.js";
 
 type GameHubProps = {
     children: React.ReactNode;
@@ -13,6 +14,8 @@ type GameHubState = {
 };
 
 function GameHubConnection({ children }: GameHubProps) {
+  const preLoaderContext = useContext(PreLoaderContext);
+
     const hubState: GameHubState = {
         // Create hub connection
         hubConnection: new HubConnectionBuilder()
@@ -30,18 +33,17 @@ function GameHubConnection({ children }: GameHubProps) {
 
     useEffect(() => {
         if (hubState.hubConnection.state === HubConnectionState.Disconnected) {
+            preLoaderContext.EnablePreLoader();
             // Start the SignalR connection
             hubState.hubConnection.start()
                 .then(() => {
                     // When SignalR connection is established, join given game from URI
                     //                                             remove the starting '/' from the path
-                    hubState.hubConnection.invoke<boolean>("Join", window.location.pathname.replace(/^\//, ""))
-                    .catch(() => ConnectionFailed())
-                        .then(result => {
-                            // If result is false, game could not be joined
-                            if (!result) ConnectionFailed()
-                        })
-                });
+                    return hubState.hubConnection.invoke<boolean>("Join", window.location.pathname.replace(/^\//, ""))
+                })
+                // Catch errors occurred in starting the connection or joining the game
+                .catch(() => ConnectionFailed())
+                .finally(() => preLoaderContext.DisablePreLoader());
 
             // register hub callbacks
             hubState.hubConnection.on("ReceiveMessage", (message: string) => {
