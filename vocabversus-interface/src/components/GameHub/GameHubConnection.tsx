@@ -51,7 +51,9 @@ function GameHubConnection({ children }: GameHubProps) {
           // When SignalR connection is established, check the given game user is trying to connect to
           return hubConnection.invoke<boolean>("CheckGame", gameId);
         })
-        .then(() => setShowRegistration(true))
+        .then(() => {
+          return setShowRegistration(true);
+        })
         // Catch errors occurred in starting the connection or joining the game
         .catch(() => ConnectionFailed())
         .finally(() => preLoaderContext.DisablePreLoader());
