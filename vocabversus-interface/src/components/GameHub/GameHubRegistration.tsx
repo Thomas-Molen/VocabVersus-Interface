@@ -75,8 +75,7 @@ function GameHubRegistration() {
         >
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <UsernameInput
-              id="register-username-input1"
-              key="register-username-input2"
+              autoFocus
               label="username"
               variant="outlined"
               value={username}

@@ -46,8 +46,8 @@ function GameHubConnection({ children }: GameHubProps) {
       hubConnection
         .start()
         .then(() => {
-          // When SignalR connection is established, join the game referenced with the gameId
-          return hubConnection.invoke<boolean>("Connect", gameId);
+          // When SignalR connection is established, check the given game user is trying to connect to
+          return hubConnection.invoke<boolean>("CheckGame", gameId);
         })
         // Catch errors occurred in starting the connection or joining the game
         .catch(() => ConnectionFailed())
