@@ -11,20 +11,28 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import NotFound from "./components/NotFound";
 import PreLoader from "./components/PreLoader";
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+  },
+});
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <PreLoader>
-    <Router>
-      <Routes>
-        <Route path="/:gameid" element={
+  <ThemeProvider theme={darkTheme}>
+    <PreLoader>
+      <Router>
+        <Routes>
+          <Route path="/:gameid" element={
             <GameHubConnection>
               <GameInterface />
-            </GameHubConnection>}/>
+            </GameHubConnection>} />
           <Route path="*" element={
             <NotFound />
           } />
-      </Routes>
-    </Router>
-  </PreLoader>
-
+        </Routes>
+      </Router>
+    </PreLoader>
+  </ThemeProvider>
 );

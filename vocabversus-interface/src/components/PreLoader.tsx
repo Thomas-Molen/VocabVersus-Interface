@@ -11,13 +11,14 @@ function PreLoader({ children }: PreLoaderProps) {
     const [isActive, setIsActive] = useState(true);
 
     return (
-        <div id="gamehub">
-            <PreLoaderContext.Provider value={{
-                EnablePreLoader: () => setIsActive(true),
-                DisablePreLoader: () => setIsActive(false),
-            }}>
-                {isActive &&
-                    <div style={{
+        <PreLoaderContext.Provider value={{
+            EnablePreLoader: () => setIsActive(true),
+            DisablePreLoader: () => setIsActive(false),
+        }}>
+            {isActive &&
+                <div
+                    id="preloader"
+                    style={{
                         backgroundColor: "#242424",
                         position: "absolute",
                         top: "0px",
@@ -27,12 +28,11 @@ function PreLoader({ children }: PreLoaderProps) {
                         alignItems: "center",
                         justifyContent: "center"
                     }}>
-                        <div title="Vocab Versus..." className="text-glitch">Vocab Versus...</div>
-                    </div>
-                }
-                {children}
-            </PreLoaderContext.Provider>
-        </div>
+                    <div title="Vocab Versus..." className="text-glitch">Vocab Versus...</div>
+                </div>
+            }
+            {children}
+        </PreLoaderContext.Provider>
     )
 }
 

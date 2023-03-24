@@ -4,7 +4,7 @@ import { useEffect } from "react";
 function Title() {
   useEffect(() => {
     // Randomize titel letters on hover
-    const letters = "ABCEFINORSTUV";
+    const letters = "ABCEFINORSTUVabcefinorstuv";
     const title = document.getElementById("title");
     if (title != null) {
       title.onmouseover = (event) => {

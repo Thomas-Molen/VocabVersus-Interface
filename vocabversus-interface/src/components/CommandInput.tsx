@@ -30,7 +30,7 @@ function CommandInput() {
         onSubmit={(event) => {
           event.preventDefault();
           if (message) {
-            gameHubContext.SendMessage(message)
+            gameHubContext.JoinGame(message)
             setMessage("");
           }
         }}>
