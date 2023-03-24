@@ -1,5 +1,4 @@
 import Title from "./Title";
-import CommandInput from "./CommandInput";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 
@@ -14,7 +13,6 @@ function GameInterface() {
         width="100%"
       >
         <Title />
-        <CommandInput />
       </Stack>
     </Box>
   );

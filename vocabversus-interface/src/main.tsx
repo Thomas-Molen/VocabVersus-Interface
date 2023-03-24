@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import ReactDOM from "react-dom/client";
-import GameHubConnection from "./components/GameHubConnection";
+import GameHubConnection from "./components/GameHub/GameHubConnection";
 import GameInterface from "./components/GameInterface";
 import { Route, Routes, BrowserRouter as Router } from "react-router-dom";
 import "./main.css";
