@@ -7,12 +7,15 @@ import {
   HubConnectionState,
 } from "@microsoft/signalr";
 import { useNavigate } from "react-router-dom";
-import { GameHubContext } from "./GameHubContext.js";
+import { GameHubCommandsContext, GameHubEventsContext } from "./GameHubContext";
 import { PreLoaderContext } from "../PreLoaderContext.js";
 import GameHubRegistration from "./GameHubRegistration.js";
-import { IGameHubCommands } from "./GameHubCommands.js";
-import { Player } from "../types/Player.js";
+import { IGameHubCommands } from "./IGameHubCommands.js";
 import { JoinGameResponse } from "./responses/ConnectionResponses";
+import {
+  GameHubEventHandler,
+  PlayerJoined,
+} from "../../utility/GameHubEventsHandler.js";
 
 type GameHubProps = {
   children: React.ReactNode;
@@ -29,9 +32,8 @@ function GameHubConnection({ children }: GameHubProps) {
       .configureLogging(LogLevel.Information)
       .build()
   );
-
-  // TODO: Remove this temp users list
-  const [players, setPlayers] = useState<Player[]>([]);
+  const [gameHubEvents] = useState(new GameHubEventHandler());
+  const [showRegistration, setShowRegistration] = useState(false);
 
   const navigate = useNavigate();
   function ConnectionFailed() {
@@ -49,6 +51,9 @@ function GameHubConnection({ children }: GameHubProps) {
           // When SignalR connection is established, check the given game user is trying to connect to
           return hubConnection.invoke<boolean>("CheckGame", gameId);
         })
+        .then(() => {
+          return setShowRegistration(true);
+        })
         // Catch errors occurred in starting the connection or joining the game
         .catch(() => ConnectionFailed())
         .finally(() => preLoaderContext.DisablePreLoader());
@@ -56,8 +61,12 @@ function GameHubConnection({ children }: GameHubProps) {
       // register connection handlers
       hubConnection.onclose(() => ConnectionFailed());
       // register hub callbacks
-      hubConnection.on("UserJoined", (username: string) => {
-        setPlayers((prevPlayers) => [...prevPlayers, new Player(username)]);
+      // register them here directly as registering them through data providers and useEffect will cause them to duplicate during hot-reloading
+      hubConnection.on("UserJoined", (username: string, userIdentifier: string) => {
+        gameHubEvents.InvokePlayerJoined(new PlayerJoined(username, userIdentifier));
+      });
+      hubConnection.on("UserLeft", (userIdentifier: string) => {
+        gameHubEvents.InvokePlayerLeft(userIdentifier);
       });
     }
   }, []);
@@ -68,35 +77,29 @@ function GameHubConnection({ children }: GameHubProps) {
       return hubConnection
         .invoke<JoinGameResponse>("Join", gameId, username)
         .then((gameInfo) => {
-          // Set new players
-          let newPlayers: Player[] = [];
+          // Go through all already joined players, and invoke the player joined event for them
           Object.keys(gameInfo.players).map((key) =>
-            newPlayers.push(
-              new Player(
+            gameHubEvents.InvokePlayerJoined(
+              new PlayerJoined(
                 `${gameInfo.players[key]} ${
                   key == gameInfo.personalIdentifier ? "<- (you)" : ""
-                }`
+                }`,
+                key
               )
             )
           );
-          setPlayers(newPlayers);
         });
     },
   };
 
   return (
     <div id="gamehub">
-      <div id="players-list" style={{
-        position: "absolute"
-      }}>
-        {players.map((player, index) => {
-          return <h2 key={index}>{player.username}</h2>;
-        })}
-      </div>
-      <GameHubContext.Provider value={commands}>
-        <GameHubRegistration />
-        {children}
-      </GameHubContext.Provider>
+      <GameHubCommandsContext.Provider value={commands}>
+        <GameHubEventsContext.Provider value={gameHubEvents}>
+          {showRegistration && <GameHubRegistration />}
+          {children}
+        </GameHubEventsContext.Provider>
+      </GameHubCommandsContext.Provider>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import ReactDOM from "react-dom/client";
 import GameHubConnection from "./components/GameHub/GameHubConnection";
-import GameInterface from "./components/GameInterface";
+import GameInterface from "./components/GamePlay/GameInterface";
 import { Route, Routes, BrowserRouter as Router } from "react-router-dom";
 import "./main.css";
 // Roboto font used by Material UI

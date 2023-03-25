@@ -1,10 +1,23 @@
+import {
+  HubConnection,
+  HubConnectionBuilder,
+  LogLevel,
+} from "@microsoft/signalr";
 import { createContext } from "react";
-import { IGameHubCommands } from "./GameHubCommands";
+import {
+  GameHubEventHandler,
+  PlayerJoined,
+} from "../../utility/GameHubEventsHandler";
+import { IGameHubCommands } from "./IGameHubCommands";
 
-export const GameHubContext = createContext<IGameHubCommands>({
+export const GameHubCommandsContext = createContext<IGameHubCommands>({
   JoinGame: (username: string) => {
     return new Promise<void>((resolve, reject) =>
-      console.log(`Joined as: ${username}`)
+      console.log("JoinGame has not been set for GameHubCommandsContext")
     );
   },
 });
+
+export const GameHubEventsContext = createContext<GameHubEventHandler>(
+  new GameHubEventHandler()
+);

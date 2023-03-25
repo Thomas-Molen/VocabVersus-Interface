@@ -11,7 +11,7 @@ import {
 import { styled } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
 import Login from "@mui/icons-material/Login";
-import { GameHubContext } from "./GameHubContext";
+import { GameHubCommandsContext } from "./GameHubContext";
 import {
   GameHubExceptionCode,
   GetErrorCode,
@@ -46,12 +46,12 @@ function GameHubRegistration() {
   const [username, setUsername] = useState("");
   const [showRegistration, setShowRegistration] = useState(true);
   const [showJoinError, setShowJoinError] = useState(false);
-  const gameHubContext = useContext(GameHubContext);
+  const gameHubCommandsContext = useContext(GameHubCommandsContext);
 
   return (
     <Modal open={showRegistration}>
       <>
-        <Paper className="registration-container" sx={{}} elevation={3}>
+        <Paper className="registration-container" elevation={3}>
           <RegistrationErrorCollpase in={showJoinError}>
             <Alert
               variant="outlined"
@@ -71,7 +71,7 @@ function GameHubRegistration() {
             onSubmit={(event) => {
               event.preventDefault();
               if (username) {
-                gameHubContext
+                gameHubCommandsContext
                   .JoinGame(username)
                   .then(() => {
                     // disable registration as user has joined successfully
