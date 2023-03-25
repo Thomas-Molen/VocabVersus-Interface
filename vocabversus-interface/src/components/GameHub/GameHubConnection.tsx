@@ -30,8 +30,6 @@ function GameHubConnection({ children }: GameHubProps) {
       .build()
   );
 
-  const [showRegistration, setShowRegistration] = useState(false);
-
   // TODO: Remove this temp users list
   const [players, setPlayers] = useState<Player[]>([]);
 
@@ -50,9 +48,6 @@ function GameHubConnection({ children }: GameHubProps) {
         .then(() => {
           // When SignalR connection is established, check the given game user is trying to connect to
           return hubConnection.invoke<boolean>("CheckGame", gameId);
-        })
-        .then(() => {
-          return setShowRegistration(true);
         })
         // Catch errors occurred in starting the connection or joining the game
         .catch(() => ConnectionFailed())
@@ -91,15 +86,15 @@ function GameHubConnection({ children }: GameHubProps) {
 
   return (
     <div id="gamehub">
-      {players.map((player, index) => {
-        return (
-          <div key={index}>
-            <h2>{player.username}</h2>
-          </div>
-        );
-      })}
+      <div id="players-list" style={{
+        position: "absolute"
+      }}>
+        {players.map((player, index) => {
+          return <h2 key={index}>{player.username}</h2>;
+        })}
+      </div>
       <GameHubContext.Provider value={commands}>
-        {showRegistration && <GameHubRegistration />}
+        <GameHubRegistration />
         {children}
       </GameHubContext.Provider>
     </div>

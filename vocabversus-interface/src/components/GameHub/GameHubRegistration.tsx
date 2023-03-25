@@ -1,12 +1,22 @@
 import { useContext, useState } from "react";
 import Modal from "@mui/material/Modal";
 import Paper from "@mui/material/Paper/Paper";
-import { Box, Divider, InputBase, TextField } from "@mui/material";
-import { alpha, styled } from "@mui/material/styles";
+import {
+  Alert,
+  AlertTitle,
+  Collapse,
+  Theme,
+  TextField,
+} from "@mui/material";
+import { styled } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
 import Login from "@mui/icons-material/Login";
 import { GameHubContext } from "./GameHubContext";
-import { GameHubExceptionCode, GetErrorCode } from '../../utility/GameHubExceptionParser'
+import {
+  GameHubExceptionCode,
+  GetErrorCode,
+} from "../../utility/GameHubExceptionParser";
+import "./GameHubRegistration.css";
 
 //declare the const and add the material UI style
 const UsernameInput = styled(TextField)({
@@ -26,55 +36,59 @@ const UsernameInput = styled(TextField)({
   },
 });
 
+const RegistrationErrorCollpase = styled(Collapse)({
+  "&.MuiCollapse-entered": {
+    paddingBottom: "20px",
+  },
+});
+
 function GameHubRegistration() {
   const [username, setUsername] = useState("");
   const [showRegistration, setShowRegistration] = useState(true);
+  const [showJoinError, setShowJoinError] = useState(false);
   const gameHubContext = useContext(GameHubContext);
 
   return (
     <Modal open={showRegistration}>
-      <Paper
-        sx={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          p: 2,
-          outline: "none",
-        }}
-        elevation={3}
-      >
-        <form
-          style={{
-            display: "flex",
-            width: "100%",
-          }}
-          onSubmit={(event) => {
-            event.preventDefault();
-            if (username) {
-              gameHubContext.JoinGame(username)
-                .catch((error) => {
-                  const errorCode = GetErrorCode(error)
-                  if (errorCode === GameHubExceptionCode.UserAddFailed)
-                  {
-                    console.log("user failed to join");
+      <>
+        <Paper className="registration-container" sx={{}} elevation={3}>
+          <RegistrationErrorCollpase in={showJoinError}>
+            <Alert
+              variant="outlined"
+              severity="error"
+              onClose={() => setShowJoinError(false)}
+            >
+              <AlertTitle>Failed to join</AlertTitle>
+              game might be full or you already joined in a different window
+            </Alert>
+          </RegistrationErrorCollpase>
+          <form
+            style={{
+              paddingLeft: "10px",
+              paddingRight: "10px",
+              display: "flex",
+            }}
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (username) {
+                gameHubContext
+                  .JoinGame(username)
+                  .then(() => {
+                    // disable registration as user has joined successfully
+                    return setShowRegistration(false);
+                  })
+                  .catch((error) => {
+                    const errorCode = GetErrorCode(error);
                     // show error message for user failed to join
-                  }
-                  else
-                  {
-                    console.log("some other error: ", errorCode);
-                    // handle unexpected errors
-                  }
-                })
-                .then(() => {
-                  // disable registration as user has joined successfully
-                  setShowRegistration(false);
-                });
-            }
-          }}
-        >
-          <Box sx={{ display: "flex", alignItems: "center" }}>
+                    if (errorCode === GameHubExceptionCode.UserAddFailed) {
+                      setShowJoinError(true);
+                    }
+                  });
+              }
+            }}
+          >
             <UsernameInput
+              fullWidth
               autoFocus
               label="username"
               variant="outlined"
@@ -89,9 +103,9 @@ function GameHubRegistration() {
             >
               <Login sx={{ color: "ffffffde" }} fontSize="large" />
             </IconButton>
-          </Box>
-        </form>
-      </Paper>
+          </form>
+        </Paper>
+      </>
     </Modal>
   );
 }
