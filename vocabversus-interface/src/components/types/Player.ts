@@ -3,9 +3,9 @@ export class Player {
   identifier: string;
   isConnected: boolean;
 
-  constructor(username: string, identifier: string) {
+  constructor(username: string, identifier: string, isConnected: boolean = true) {
     this.username = username;
     this.identifier = identifier;
-    this.isConnected = true;
+    this.isConnected = isConnected;
   }
 }

@@ -81,10 +81,11 @@ function GameHubConnection({ children }: GameHubProps) {
           Object.keys(gameInfo.players).map((key) =>
             gameHubEvents.InvokePlayerJoined(
               new PlayerJoined(
-                `${gameInfo.players[key]} ${
+                `${gameInfo.players[key].username} ${
                   key == gameInfo.personalIdentifier ? "<- (you)" : ""
                 }`,
-                key
+                key,
+                gameInfo.players[key].isConnected
               )
             )
           );

@@ -13,7 +13,7 @@ function PlayersList() {
     gameHubEvents.OnPlayerJoined((playerJoined) => {
       setPlayers((prevPlayers) => [
         ...prevPlayers,
-        new Player(playerJoined.username, playerJoined.identifier),
+        new Player(playerJoined.username, playerJoined.identifier, playerJoined.isConnected),
       ]);
     }, "player-list");
 
@@ -52,17 +52,7 @@ function PlayersList() {
                 cursor: "pointer",
               }}
               // TODO: Add modal for player actions
-              onClick={() => {
-                const newPlayers = players.map(player => {
-                  console.log(player);
-                  if (player.identifier === player.identifier) {
-                    player.isConnected = false;
-                  }
-                  return player;
-                })
-                console.log(newPlayers);
-                setPlayers(newPlayers);
-              }}
+              onClick={() => console.log("open player actionsx")}
             >
               <h3>{player.username}</h3>
               {!player.isConnected && <MobiledataOffIcon color="warning" />}
