@@ -9,9 +9,12 @@ import { useNavigate } from "react-router-dom";
 import { GameHubCommandsContext, GameHubStatesContext, IGameHubCommands, IGameHubStates } from "./GameHubContext";
 import { PreLoaderContext } from "../PreLoaderContext.js";
 import GameHubRegistration from "./GameHubRegistration.js";
-import { JoinGameResponse } from "./responses/ConnectionResponses";
-import { Player } from "../types/Player";
-import { User } from "../types/User";
+import { CheckGameResponse, JoinGameResponse } from "./responses/ConnectionResponses";
+import { Player } from "../models/Player";
+import { User } from "../models/User";
+import { GameHub } from "../models/GameHub";
+import { Game } from "../models/Game";
+import { GameState } from "../models/GameState";
 
 type GameHubProps = {
   children: React.ReactNode;
@@ -20,8 +23,9 @@ type GameHubProps = {
 function GameHubConnection({ children }: GameHubProps) {
   const preLoaderContext = useContext(PreLoaderContext);
 
-  // Get the gameId from URI                         remove the starting '/' from the path
-  const [gameId] = useState(window.location.pathname.replace(/^\//, ""));
+  const [user, setUser] = useState<User>(new User(""));
+  // Get the gameId from URI
+  const [game, setGame] = useState<Game>(new Game(window.location.pathname.replace(/^\//, ""), GameState.Lobby, 0))
   const [hubConnection] = useState(
     new HubConnectionBuilder()
       .withUrl(`${import.meta.env.VITE_GAME_HUB_BASE_URL}game`)
@@ -30,7 +34,6 @@ function GameHubConnection({ children }: GameHubProps) {
   );
   const [showRegistration, setShowRegistration] = useState(false);
   const [players, setPlayers] = useState<Player[]>([]);
-  const [user, setUser] = useState<User>(new User(""));
 
   const navigate = useNavigate();
   function ConnectionFailed() {
@@ -41,12 +44,16 @@ function GameHubConnection({ children }: GameHubProps) {
   useEffect(() => {
     if (hubConnection.state === HubConnectionState.Disconnected) {
       preLoaderContext.EnablePreLoader();
+
       // Start the SignalR connection
       hubConnection
         .start()
         .then(() => {
           // When SignalR connection is established, check the given game user is trying to connect to
-          return hubConnection.invoke<boolean>("CheckGame", gameId);
+          return hubConnection.invoke<CheckGameResponse>("CheckGame", game.gameId)
+          .then((gameInfo) => {
+            setGame({...game, gameState: gameInfo.gameState, maxPlayers: gameInfo.maxPlayerCount})
+          });
         })
         .then(() => {
           return setShowRegistration(true);
@@ -96,6 +103,13 @@ function GameHubConnection({ children }: GameHubProps) {
           })
         }
       );
+
+      // Game Events
+      hubConnection.on("GameStateChanged", (gameState: GameState) => {
+        setGame((game) => {
+          return {...game, gameState: gameState}
+         })
+      })
     }
   }, []);
 
@@ -103,7 +117,7 @@ function GameHubConnection({ children }: GameHubProps) {
   const commands: IGameHubCommands = {
     JoinGame: (username) => {
       return hubConnection
-        .invoke<JoinGameResponse>("Join", gameId, username)
+        .invoke<JoinGameResponse>("Join", game.gameId, username)
         .then((gameInfo) => {
           setUser(new User(gameInfo.personalIdentifier));
           // Go through all already joined players, and invoke the player joined event for them
@@ -121,10 +135,10 @@ function GameHubConnection({ children }: GameHubProps) {
         });
     },
     SetReady: (readyState) => {
-      return hubConnection.invoke("Ready", gameId, readyState);
+      return hubConnection.invoke("Ready", game.gameId, readyState);
     },
     KickPlayer: (playerIdentifier) => {
-      return hubConnection.invoke("Kick", gameId, playerIdentifier)
+      return hubConnection.invoke("Kick", game.gameId, playerIdentifier)
         .then(() => {
           setPlayers((prevPlayers) => prevPlayers.filter(p => p.identifier !== playerIdentifier));
         })
@@ -134,7 +148,7 @@ function GameHubConnection({ children }: GameHubProps) {
   const states: IGameHubStates = {
     GetPlayers: () => {return players},
     SetPlayers: (newPlayers) => setPlayers(newPlayers),
-    GetHubInfo: () => {return user}
+    GetHubInfo: () => {return new GameHub(user, game)}
   }
 
   return (

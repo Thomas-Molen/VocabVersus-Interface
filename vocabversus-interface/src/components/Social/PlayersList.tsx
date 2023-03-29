@@ -4,7 +4,8 @@ import MobiledataOffIcon from "@mui/icons-material/MobiledataOff";
 import CheckIcon from "@mui/icons-material/Check";
 import { GameHubStatesContext } from "../GameHub/GameHubContext";
 import PlayerDetails from "./PlayerDetails";
-import { Player } from "../types/Player";
+import { Player } from "../models/Player";
+import { GameState } from "../models/GameState";
 
 function PlayersList() {
   const stateContext = useContext(GameHubStatesContext);
@@ -32,16 +33,15 @@ function PlayersList() {
                 alignItems: "center",
                 cursor: "pointer",
               }}
-              // TODO: Add modal for player actions
               onClick={() => {
                 setSelectedPlayer(player);
                 setShowDetails(true);
               }}
             >
               <h3>{player.username}</h3>
-              {player.identifier === stateContext.GetHubInfo().identifier && <h4>{"<- you"}</h4>}
+              {player.identifier === stateContext.GetHubInfo().userInformation.identifier && <h4>{"<- you"}</h4>}
               {!player.isConnected && <MobiledataOffIcon color="warning" />}
-              {player.isReady && <CheckIcon color="success" />}
+              {(player.isReady && stateContext.GetHubInfo().game.gameState === GameState.Lobby) && <CheckIcon color="success" />}
             </div>
           );
         })}

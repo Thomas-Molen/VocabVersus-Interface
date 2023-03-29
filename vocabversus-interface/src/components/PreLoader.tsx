@@ -1,4 +1,4 @@
-import "./PreLoader.css";
+import "./GlitchText.css";
 import React, { useState } from "react";
 import { PreLoaderContext } from "./PreLoaderContext.js";
 
@@ -25,7 +25,8 @@ function PreLoader({ children }: PreLoaderProps) {
                         width: "100%",
                         display: "flex",
                         alignItems: "center",
-                        justifyContent: "center"
+                        justifyContent: "center",
+                        zIndex: 100,
                     }}>
                     <div title="Vocab Versus..." className="text-glitch">Vocab Versus...</div>
                 </div>

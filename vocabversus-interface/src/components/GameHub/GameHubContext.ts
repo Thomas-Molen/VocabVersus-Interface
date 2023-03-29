@@ -2,8 +2,11 @@ import { createContext } from "react";
 import {
   GameHubEventHandler,
 } from "../../utility/GameHubEventsHandler";
-import { Player } from "../types/Player";
-import { User } from "../types/User";
+import { Game } from "../models/Game";
+import { GameHub } from "../models/GameHub";
+import { GameState } from "../models/GameState";
+import { Player } from "../models/Player";
+import { User } from "../models/User";
 
 export interface IGameHubCommands {
   JoinGame(username: string): Promise<any>;
@@ -36,11 +39,11 @@ export const GameHubEventsContext = createContext<GameHubEventHandler>(
 export interface IGameHubStates {
   GetPlayers(): Player[];
   SetPlayers(players: Player[]): void;
-  GetHubInfo(): User;
+  GetHubInfo(): GameHub;
 }
 
 export const GameHubStatesContext = createContext<IGameHubStates>({
   GetPlayers: () => {return []},
   SetPlayers: (players: Player[]) => console.log("SetPlayer has not been set for GameHubStatesContext"),
-  GetHubInfo: () => {return new User("")},
+  GetHubInfo: () => {return new GameHub(new User(""), new Game("", GameState.Lobby, 0))},
 });

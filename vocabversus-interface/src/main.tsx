@@ -11,6 +11,7 @@ import "@fontsource/roboto/700.css";
 import NotFound from "./components/NotFound";
 import PreLoader from "./components/PreLoader";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
+import CountDown from "./components/GamePlay/CountDown";
 
 const darkTheme = createTheme({
   palette: {
@@ -27,7 +28,9 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
             path="/:gameid"
             element={
               <GameHubConnection>
-                <GameInterface />
+                <CountDown timeMargin={1.5} simulatedSecond={1150}>
+                  <GameInterface />
+                </CountDown>
               </GameHubConnection>
             }
           />

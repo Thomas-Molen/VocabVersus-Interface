@@ -1,15 +1,19 @@
+import { GameState } from "../../models/GameState";
+
 interface GamePlayerRecord {
   username: string;
   isConnected: boolean;
   isReady: boolean;
 }
 
-export class JoinGameResponse {
+export type JoinGameResponse = {
   personalIdentifier: string;
   players: {[key: string]: GamePlayerRecord};
+}
 
-  constructor(personIdentifier: string, players: {[key: string]: GamePlayerRecord}){
-    this.personalIdentifier = personIdentifier,
-    this.players = players
-  }
+export type CheckGameResponse = {
+  gameId: string;
+  gameState: GameState;
+  playerCount: number;
+  maxPlayerCount: number;
 }

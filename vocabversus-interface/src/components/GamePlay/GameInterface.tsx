@@ -1,10 +1,19 @@
+import { useContext } from "react";
 import Title from "../Title";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 import PlayersList from "../Social/PlayersList";
 import ReadyButton from "./ReadyButton";
+import { GameHubStatesContext } from "../GameHub/GameHubContext";
+import { GameState } from "../models/GameState";
+import { CountDownContext } from "./CountDownContext";
+import { Button } from "@mui/material";
+
 
 function GameInterface() {
+  const stateContext = useContext(GameHubStatesContext);
+  const countDownContext = useContext(CountDownContext);
+
   return (
     <>
       <PlayersList />
@@ -19,7 +28,12 @@ function GameInterface() {
           width="100%"
         >
           <Title />
-          <ReadyButton />
+          {stateContext.GetHubInfo().game.gameState === GameState.Lobby && (
+            <ReadyButton />
+          )}
+          <Button onClick={() => countDownContext.SetCountDown(Date.now()+10000)}>
+            Start Timer
+          </Button>
         </Stack>
       </Box>
     </>

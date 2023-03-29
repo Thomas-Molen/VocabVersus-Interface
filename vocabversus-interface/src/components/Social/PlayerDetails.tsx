@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { Button, Modal, Paper } from "@mui/material";
 import Stack from "@mui/material/Stack/Stack";
-import { Player } from "../types/Player";
+import { Player } from "../models/Player";
 import "./PlayerDetails.css";
 import { GameHubCommandsContext } from "../GameHub/GameHubContext";
 import { GetErrorCode } from "../../utility/GameHubExceptionParser";

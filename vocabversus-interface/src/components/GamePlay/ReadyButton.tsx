@@ -11,7 +11,7 @@ function ReadyButton() {
       <Button
         variant={
           stateContext.GetPlayers().some(
-            (player) => player.identifier === stateContext.GetHubInfo().identifier && player.isReady
+            (player) => player.identifier === stateContext.GetHubInfo().userInformation.identifier && player.isReady
           )
             ? "contained"
             : "outlined"
@@ -19,7 +19,7 @@ function ReadyButton() {
         size="large"
         onClick={() => {
           let newPlayers = stateContext.GetPlayers().map((player) => {
-            if (player.identifier === stateContext.GetHubInfo().identifier) {
+            if (player.identifier === stateContext.GetHubInfo().userInformation.identifier) {
               gameHubCommandsContext.SetReady(!player.isReady);
               return { ...player, isReady: !player.isReady };
             }
