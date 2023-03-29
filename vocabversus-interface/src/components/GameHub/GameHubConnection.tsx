@@ -3,19 +3,15 @@ import { useEffect, useState } from "react";
 import {
   HubConnectionBuilder,
   LogLevel,
-  HubConnection,
   HubConnectionState,
 } from "@microsoft/signalr";
 import { useNavigate } from "react-router-dom";
-import { GameHubCommandsContext, GameHubEventsContext } from "./GameHubContext";
+import { GameHubCommandsContext, GameHubStatesContext, IGameHubCommands, IGameHubStates } from "./GameHubContext";
 import { PreLoaderContext } from "../PreLoaderContext.js";
 import GameHubRegistration from "./GameHubRegistration.js";
-import { IGameHubCommands } from "./IGameHubCommands.js";
 import { JoinGameResponse } from "./responses/ConnectionResponses";
-import {
-  GameHubEventHandler,
-  PlayerJoined,
-} from "../../utility/GameHubEventsHandler.js";
+import { Player } from "../types/Player";
+import { User } from "../types/User";
 
 type GameHubProps = {
   children: React.ReactNode;
@@ -32,8 +28,9 @@ function GameHubConnection({ children }: GameHubProps) {
       .configureLogging(LogLevel.Information)
       .build()
   );
-  const [gameHubEvents] = useState(new GameHubEventHandler());
   const [showRegistration, setShowRegistration] = useState(false);
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [user, setUser] = useState<User>(new User(""));
 
   const navigate = useNavigate();
   function ConnectionFailed() {
@@ -60,14 +57,45 @@ function GameHubConnection({ children }: GameHubProps) {
 
       // register connection handlers
       hubConnection.onclose(() => ConnectionFailed());
+
       // register hub callbacks
-      // register them here directly as registering them through data providers and useEffect will cause them to duplicate during hot-reloading
-      hubConnection.on("UserJoined", (username: string, userIdentifier: string) => {
-        gameHubEvents.InvokePlayerJoined(new PlayerJoined(username, userIdentifier));
-      });
+      // User connection
+      hubConnection.on(
+        "UserJoined",
+        (username: string, userIdentifier: string) =>
+          setPlayers((prevPlayers) => [
+            ...prevPlayers,
+            new Player(username, userIdentifier),
+          ])
+      );
       hubConnection.on("UserLeft", (userIdentifier: string) => {
-        gameHubEvents.InvokePlayerLeft(userIdentifier);
+        setPlayers((prevPlayers) => {
+          return prevPlayers.map(player => {
+            if (player.identifier === userIdentifier) {
+              player.isConnected = false;
+            }
+            return player;
+          })
+        })
       });
+      hubConnection.on("UserRemoved", (userIdentifier: string) => {
+        setPlayers((prevPlayers) => prevPlayers.filter(p => p.identifier !== userIdentifier));
+      });
+
+      // User actions
+      hubConnection.on(
+        "UserReady",
+        (readyState: boolean, userIdentifier: string) => {
+          setPlayers((prevPlayers) => {
+            return prevPlayers.map(player => {
+              if (player.identifier === userIdentifier) {
+                player.isReady = readyState;
+              }
+              return player;
+            })
+          })
+        }
+      );
     }
   }, []);
 
@@ -77,30 +105,46 @@ function GameHubConnection({ children }: GameHubProps) {
       return hubConnection
         .invoke<JoinGameResponse>("Join", gameId, username)
         .then((gameInfo) => {
+          setUser(new User(gameInfo.personalIdentifier));
           // Go through all already joined players, and invoke the player joined event for them
           Object.keys(gameInfo.players).map((key) =>
-            gameHubEvents.InvokePlayerJoined(
-              new PlayerJoined(
-                `${gameInfo.players[key].username} ${
-                  key == gameInfo.personalIdentifier ? "<- (you)" : ""
-                }`,
+            setPlayers((prevPlayers) => [
+              ...prevPlayers,
+              new Player(
+                gameInfo.players[key].username,
                 key,
-                gameInfo.players[key].isConnected
-              )
-            )
+                gameInfo.players[key].isConnected,
+                gameInfo.players[key].isReady
+              ),
+            ])
           );
         });
     },
+    SetReady: (readyState) => {
+      return hubConnection.invoke("Ready", gameId, readyState);
+    },
+    KickPlayer: (playerIdentifier) => {
+      return hubConnection.invoke("Kick", gameId, playerIdentifier)
+        .then(() => {
+          setPlayers((prevPlayers) => prevPlayers.filter(p => p.identifier !== playerIdentifier));
+        })
+    }
   };
+
+  const states: IGameHubStates = {
+    GetPlayers: () => {return players},
+    SetPlayers: (newPlayers) => setPlayers(newPlayers),
+    GetHubInfo: () => {return user}
+  }
 
   return (
     <div id="gamehub">
-      <GameHubCommandsContext.Provider value={commands}>
-        <GameHubEventsContext.Provider value={gameHubEvents}>
+        <GameHubCommandsContext.Provider value={commands}>
+          <GameHubStatesContext.Provider value={states}>
           {showRegistration && <GameHubRegistration />}
           {children}
-        </GameHubEventsContext.Provider>
-      </GameHubCommandsContext.Provider>
+          </GameHubStatesContext.Provider>
+        </GameHubCommandsContext.Provider>
     </div>
   );
 }

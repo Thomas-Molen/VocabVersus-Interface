@@ -1,4 +1,5 @@
-// TODO: MAKE THIS GENERIC
+// DEPRECATED IN FAVOR OF RECOIL ATOMS FOR STATE MANAGEMENT
+// Keeping this here as a similar handler might still be required in the future
 
 export class PlayerJoined {
   username: string;
@@ -12,71 +13,37 @@ export class PlayerJoined {
   }
 }
 
-class playerJoinedMethod{
-  method: ((args: PlayerJoined) => void);
+class Method{
+  method: ((args: any) => void);
+  call: string;
   identifier: string | undefined;
-
-  constructor(method: ((args: PlayerJoined) => void), identifier : string | undefined) {
+  constructor(method: ((args: any) => void), call: string, identifier: string | undefined) {
     this.method = method;
-    this.identifier = identifier
-  }
-}
-
-class playerLeftMethod{
-  method: ((args: string) => void);
-  identifier: string | undefined;
-
-  constructor(method: ((args: string) => void), identifier : string | undefined) {
-    this.method = method;
+    this.call = call;
     this.identifier = identifier
   }
 }
 
 export class GameHubEventHandler {
-  private _playerJoinedMethods: playerJoinedMethod[];
-  private _playerLeftMethods: playerLeftMethod[];
+  private _methods: Method[];
 
   public constructor() {
-    this._playerJoinedMethods = [];
-    this._playerLeftMethods = [];
+    this._methods = [];
   }
 
-  public OnPlayerJoined(newMethod: (args: PlayerJoined) => void, identifier? : string | undefined): void {
+  public On<ArgType>(call: string, newMethod: (args: ArgType) => void, identifier?: string | undefined): void {
     // if an identifier was given, check if the identifier was already used to subscribe to handler
-    if (identifier !== undefined && this._playerJoinedMethods.some(method => method.identifier === identifier)) return;
+    if (identifier !== undefined && this._methods.some(method => method.identifier === identifier && method.call === call)) return;
     
-    this._playerJoinedMethods.push(new playerJoinedMethod(newMethod, identifier));
+    this._methods.push(new Method(newMethod, call, identifier));
   }
 
-  public InvokePlayerJoined(args: PlayerJoined) {
-    if (!this._playerJoinedMethods) {
+  public InvokeMethod<ArgType>(call: string, args: ArgType)
+  {
       // if no one subscribed, early return
-      return;
-    }
+    if (!this._methods.filter(m => m.call === call)) return;
 
-    for (const method of this._playerJoinedMethods) {
-      try {
-        method.method.apply(this, [args]);
-      } catch (e) {
-        console.log("Failed to invoke subscribed method: ", e);
-      }
-    }
-  }
-
-  public OnPlayerLeft(newMethod: (args: string) => void, identifier? : string | undefined): void {
-    // if an identifier was given, check if the identifier was already used to subscribe to handler
-    if (identifier !== undefined && this._playerLeftMethods.some(method => method.identifier === identifier)) return;
-    
-    this._playerLeftMethods.push(new playerLeftMethod(newMethod, identifier));
-  }
-
-  public InvokePlayerLeft(args: string) {
-    if (!this._playerLeftMethods) {
-      // if no one subscribed, early return
-      return;
-    }
-
-    for (const method of this._playerLeftMethods) {
+    for (const method of this._methods.filter(m => m.call === call)) {
       try {
         method.method.apply(this, [args]);
       } catch (e) {

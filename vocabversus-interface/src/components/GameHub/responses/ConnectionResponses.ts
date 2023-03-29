@@ -1,6 +1,7 @@
 interface GamePlayerRecord {
   username: string;
   isConnected: boolean;
+  isReady: boolean;
 }
 
 export class JoinGameResponse {

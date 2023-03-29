@@ -1,7 +1,6 @@
 import "./PreLoader.css";
 import React, { useState } from "react";
 import { PreLoaderContext } from "./PreLoaderContext.js";
-import Title from "./Title.js";
 
 type PreLoaderProps = {
     children: React.ReactNode;

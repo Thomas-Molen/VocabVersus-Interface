@@ -1,4 +1,3 @@
-import React, { useContext } from "react";
 import ReactDOM from "react-dom/client";
 import GameHubConnection from "./components/GameHub/GameHubConnection";
 import GameInterface from "./components/GamePlay/GameInterface";
@@ -11,11 +10,11 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import NotFound from "./components/NotFound";
 import PreLoader from "./components/PreLoader";
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 const darkTheme = createTheme({
   palette: {
-    mode: 'dark',
+    mode: "dark",
   },
 });
 
@@ -24,13 +23,15 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <PreLoader>
       <Router>
         <Routes>
-          <Route path="/:gameid" element={
-            <GameHubConnection>
-              <GameInterface />
-            </GameHubConnection>} />
-          <Route path="*" element={
-            <NotFound />
-          } />
+          <Route
+            path="/:gameid"
+            element={
+              <GameHubConnection>
+                <GameInterface />
+              </GameHubConnection>
+            }
+          />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
     </PreLoader>

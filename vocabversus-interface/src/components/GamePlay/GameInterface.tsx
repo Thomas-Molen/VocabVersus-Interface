@@ -1,7 +1,8 @@
 import Title from "../Title";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
-import PlayersList from "./PlayersList";
+import PlayersList from "../Social/PlayersList";
+import ReadyButton from "./ReadyButton";
 
 function GameInterface() {
   return (
@@ -18,6 +19,7 @@ function GameInterface() {
           width="100%"
         >
           <Title />
+          <ReadyButton />
         </Stack>
       </Box>
     </>
