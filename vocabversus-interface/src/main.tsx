@@ -27,11 +27,11 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
           <Route
             path="/:gameid"
             element={
-              <GameHubConnection>
-                <CountDown timeMargin={1.5} simulatedSecond={1150}>
+              <CountDown timeMargin={1.5} simulatedSecond={1150}>
+                <GameHubConnection>
                   <GameInterface />
-                </CountDown>
-              </GameHubConnection>
+                </GameHubConnection>
+              </CountDown>
             }
           />
           <Route path="*" element={<NotFound />} />

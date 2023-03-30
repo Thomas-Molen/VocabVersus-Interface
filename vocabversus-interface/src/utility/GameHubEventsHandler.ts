@@ -45,7 +45,7 @@ export class GameHubEventHandler {
 
     for (const method of this._methods.filter(m => m.call === call)) {
       try {
-        method.method.apply(this, [args]);
+        method.method(args);
       } catch (e) {
         console.log("Failed to invoke subscribed method: ", e);
       }
