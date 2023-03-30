@@ -11,13 +11,14 @@ type GameHubProps = {
   simulatedSecond: number;
 };
 
+let countDownLoop: number;
 // Repeat countdown, untill it passes the overflow state
 function CountDown({ children, timeMargin, simulatedSecond }: GameHubProps) {
   function StartCountDown(value: number) {
     if (Math.round(value) > -timeMargin) {
       setTime(value);
       value = value - 1;
-      setTimeout(StartCountDown, simulatedSecond, value);
+      countDownLoop = setTimeout(StartCountDown, simulatedSecond, value);
     }
     // count down finished
     else setTime(-timeMargin);
@@ -26,16 +27,18 @@ function CountDown({ children, timeMargin, simulatedSecond }: GameHubProps) {
 
   const countDownCallbacks: ICountDownContext = {
     SetCountDown: (unixTime, highlight = true) => {
-      // TODO: Add a check to stop previous countdown if new one starts
       const simulatedSecondsCount = (unixTime - Date.now()) / simulatedSecond;
       const marginedSimulatedCount = simulatedSecondsCount - timeMargin;
+      
+      // stop currently running countDown
+      clearTimeout(countDownLoop);
       StartCountDown(marginedSimulatedCount);
 
       // animate the count down element to notify the user visually
       let countDownElement = document.getElementById("count-down");
       if (countDownElement && highlight) {
         countDownElement.classList.remove("animate-pop-out");
-        // request browser reflow 
+        // request browser reflow
         countDownElement.offsetWidth;
         countDownElement.classList.add("animate-pop-out");
       }

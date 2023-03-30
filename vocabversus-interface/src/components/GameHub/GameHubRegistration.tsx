@@ -93,6 +93,7 @@ function GameHubRegistration() {
               variant="outlined"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              inputProps={{ maxLength: 20 }}
             />
             <IconButton
               disabled={username ? false : true}

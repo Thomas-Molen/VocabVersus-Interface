@@ -6,7 +6,7 @@
 }
 
 .highlight-count{
-    color: rgb(133, 0, 0);
+    color: #ff5d5d;
 }
 
 .animate-pop-out {
@@ -18,7 +18,7 @@
       transform: scale(0);
     }
     25% {
-      color: red;
+      color: #ff5d5d;
       transform: scale(2);
     }
     50% {
