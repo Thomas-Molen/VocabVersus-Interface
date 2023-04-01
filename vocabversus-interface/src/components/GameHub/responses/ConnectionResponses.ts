@@ -7,8 +7,12 @@ interface GamePlayerRecord {
 }
 
 export type JoinGameResponse = {
-  personalIdentifier: string;
   players: {[key: string]: GamePlayerRecord};
+}
+
+export type ReJoinGameResponse = {
+  players: {[key: string]: GamePlayerRecord};
+  username: string;
 }
 
 export type CheckGameResponse = {
@@ -16,4 +20,6 @@ export type CheckGameResponse = {
   gameState: GameState;
   playerCount: number;
   maxPlayerCount: number;
+  personalIdentifier: string;
+  canReconnect: boolean;
 }

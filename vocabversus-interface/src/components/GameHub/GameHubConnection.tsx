@@ -25,6 +25,7 @@ import { Game } from "../models/Game";
 import { GameState } from "../models/GameState";
 import { CountDownContext } from "../GamePlay/CountDownContext";
 import { GameRound } from "../models/GameRound";
+import { ReJoinGameResponse } from "./responses/ConnectionResponses";
 
 type GameHubProps = {
   children: React.ReactNode;
@@ -64,17 +65,42 @@ function GameHubConnection({ children }: GameHubProps) {
         .then(() => {
           // When SignalR connection is established, check the given game user is trying to connect to
           return hubConnection
-            .invoke<CheckGameResponse>("CheckGame", game.gameId)
+            .invoke<CheckGameResponse>(
+              "CheckGame",
+              game.gameId,
+              localStorage.getItem("user-identifier")
+            )
             .then((gameInfo) => {
               setGame({
                 ...game,
                 gameState: gameInfo.gameState,
                 maxPlayers: gameInfo.maxPlayerCount,
               });
+              setUser(new User(gameInfo.personalIdentifier));
+              localStorage.setItem(
+                "user-identifier",
+                gameInfo.personalIdentifier
+              );
+              console.log(gameInfo);
+              if (gameInfo.canReconnect) {
+                hubConnection
+                  .invoke<ReJoinGameResponse>("Reconnect")
+                  .then((gameInfo) => {
+                    return Object.keys(gameInfo.players).map((key) =>
+                      setPlayers((prevPlayers) => [
+                        ...prevPlayers,
+                        new Player(
+                          gameInfo.players[key].username,
+                          key,
+                          gameInfo.players[key].isConnected,
+                          gameInfo.players[key].isReady
+                        ),
+                      ])
+                    );
+                  })
+                  .catch(() => setShowRegistration(true));
+              } else setShowRegistration(true);
             });
-        })
-        .then(() => {
-          return setShowRegistration(true);
         })
         // Catch errors occurred in starting the connection or joining the game
         .catch(() => ConnectionFailed())
@@ -93,6 +119,16 @@ function GameHubConnection({ children }: GameHubProps) {
             new Player(username, userIdentifier),
           ])
       );
+      hubConnection.on("UserReconnected", (userIdentifier: string) => {
+        setPlayers((prevPlayers) => {
+          return prevPlayers.map((player) => {
+            if (player.identifier === userIdentifier) {
+              player.isConnected = true;
+            }
+            return player;
+          });
+        });
+      });
       hubConnection.on("UserLeft", (userIdentifier: string) => {
         setPlayers((prevPlayers) => {
           return prevPlayers.map((player) => {
@@ -145,7 +181,6 @@ function GameHubConnection({ children }: GameHubProps) {
       return hubConnection
         .invoke<JoinGameResponse>("Join", game.gameId, username)
         .then((gameInfo) => {
-          setUser(new User(gameInfo.personalIdentifier));
           // Go through all already joined players, and invoke the player joined event for them
           Object.keys(gameInfo.players).map((key) =>
             setPlayers((prevPlayers) => [
@@ -161,16 +196,14 @@ function GameHubConnection({ children }: GameHubProps) {
         });
     },
     SetReady: (readyState) => {
-      return hubConnection.invoke("Ready", game.gameId, readyState);
+      return hubConnection.invoke("Ready", readyState);
     },
     KickPlayer: (playerIdentifier) => {
-      return hubConnection
-        .invoke("Kick", game.gameId, playerIdentifier)
-        .then(() => {
-          setPlayers((prevPlayers) =>
-            prevPlayers.filter((p) => p.identifier !== playerIdentifier)
-          );
-        });
+      return hubConnection.invoke("Kick", playerIdentifier).then(() => {
+        setPlayers((prevPlayers) =>
+          prevPlayers.filter((p) => p.identifier !== playerIdentifier)
+        );
+      });
     },
   };
 
