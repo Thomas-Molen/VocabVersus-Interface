@@ -8,6 +8,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import {
   GameHubCommandsContext,
+  GameHubEventsContext,
   GameHubStatesContext,
   IGameHubCommands,
   IGameHubStates,
@@ -17,6 +18,7 @@ import GameHubRegistration from "./GameHubRegistration.js";
 import {
   CheckGameResponse,
   JoinGameResponse,
+  SubmitResponse,
 } from "./responses/ConnectionResponses";
 import { Player } from "../models/Player";
 import { User } from "../models/User";
@@ -26,6 +28,7 @@ import { GameState } from "../models/GameState";
 import { CountDownContext } from "../GamePlay/CountDownContext";
 import { GameRound } from "../models/GameRound";
 import { ReJoinGameResponse } from "./responses/ConnectionResponses";
+import { GameHubEventHandler } from "../../utility/GameHubEventsHandler";
 
 type GameHubProps = {
   children: React.ReactNode;
@@ -35,6 +38,7 @@ function GameHubConnection({ children }: GameHubProps) {
   const preLoaderContext = useContext(PreLoaderContext);
   const countDownContext = useContext(CountDownContext);
 
+  const eventHandler = new GameHubEventHandler();
   const [user, setUser] = useState<User>(new User(""));
   // Get the gameId from URI
   const [game, setGame] = useState<Game>(
@@ -81,19 +85,22 @@ function GameHubConnection({ children }: GameHubProps) {
                 "user-identifier",
                 gameInfo.personalIdentifier
               );
-              console.log(gameInfo);
               if (gameInfo.canReconnect) {
                 hubConnection
                   .invoke<ReJoinGameResponse>("Reconnect")
                   .then((gameInfo) => {
-                    return Object.keys(gameInfo.players).map((key) =>
+                    setGame((game) => {
+                      return { ...game, rounds: gameInfo.rounds };
+                    });
+                    Object.keys(gameInfo.players).map((key) =>
                       setPlayers((prevPlayers) => [
                         ...prevPlayers,
                         new Player(
                           gameInfo.players[key].username,
                           key,
                           gameInfo.players[key].isConnected,
-                          gameInfo.players[key].isReady
+                          gameInfo.players[key].isReady,
+                          gameInfo.players[key].points
                         ),
                       ])
                     );
@@ -159,6 +166,16 @@ function GameHubConnection({ children }: GameHubProps) {
           });
         }
       );
+      hubConnection.on("SubmitResult", (submitInfo: SubmitResponse) => {
+        if (submitInfo.isCorrect) {
+          setGame((game) => {
+            let latestGameRound = game.rounds.at(-1);
+            if (latestGameRound) latestGameRound.isCompletedByPlayer = true;
+            // Update the game rounds property, to re-render all components subscribed to the rounds prop
+            return { ...game, rounds: game.rounds };
+          });
+        }
+      });
 
       // Game Events
       hubConnection.on("GameStarting", (startTimeUnix: number) => {
@@ -170,8 +187,29 @@ function GameHubConnection({ children }: GameHubProps) {
         });
       });
       hubConnection.on("StartRound", (gameRound: GameRound) => {
-        console.log(`round started: ${gameRound}`);
+        eventHandler.InvokeMethod("start-round");
+        setGame((game) => {
+          game.rounds.push(gameRound);
+          return { ...game, rounds: game.rounds };
+        });
       });
+      hubConnection.on("RoundEnding", (endTimeUnix: number) => {
+        countDownContext.SetCountDown(endTimeUnix, true);
+      });
+      hubConnection.on(
+        "AddPoints",
+        (playerIdentifier: string, pointsToAdd: number) => {
+          // TODO: Add points tracker for players
+          setPlayers((prevPlayers) => {
+            return prevPlayers.map((player) => {
+              if (player.identifier === playerIdentifier) {
+                player.points += pointsToAdd;
+              }
+              return player;
+            });
+          });
+        }
+      );
     }
   }, []);
 
@@ -189,10 +227,14 @@ function GameHubConnection({ children }: GameHubProps) {
                 gameInfo.players[key].username,
                 key,
                 gameInfo.players[key].isConnected,
-                gameInfo.players[key].isReady
+                gameInfo.players[key].isReady,
+                gameInfo.players[key].points
               ),
             ])
           );
+          setGame((game) => {
+            return { ...game, rounds: gameInfo.rounds };
+          });
         });
     },
     SetReady: (readyState) => {
@@ -204,6 +246,9 @@ function GameHubConnection({ children }: GameHubProps) {
           prevPlayers.filter((p) => p.identifier !== playerIdentifier)
         );
       });
+    },
+    SubmitWord: (word) => {
+      return hubConnection.invoke("Submit", word);
     },
   };
 
@@ -221,8 +266,10 @@ function GameHubConnection({ children }: GameHubProps) {
     <div id="gamehub">
       <GameHubCommandsContext.Provider value={commands}>
         <GameHubStatesContext.Provider value={states}>
-          {showRegistration && <GameHubRegistration />}
-          {children}
+          <GameHubEventsContext.Provider value={eventHandler}>
+            {showRegistration && <GameHubRegistration />}
+            {children}
+          </GameHubEventsContext.Provider>
         </GameHubStatesContext.Provider>
       </GameHubCommandsContext.Provider>
     </div>

@@ -1,18 +1,6 @@
 // DEPRECATED IN FAVOR OF RECOIL ATOMS FOR STATE MANAGEMENT
 // Keeping this here as a similar handler might still be required in the future
 
-export class PlayerJoined {
-  username: string;
-  identifier: string;
-  isConnected: boolean;
-
-  constructor(username: string, identifier: string, isConnected: boolean = true) {
-    this.username = username;
-    this.identifier = identifier;
-    this.isConnected = isConnected;
-  }
-}
-
 class Method{
   method: ((args: any) => void);
   call: string;
@@ -38,7 +26,7 @@ export class GameHubEventHandler {
     this._methods.push(new Method(newMethod, call, identifier));
   }
 
-  public InvokeMethod<ArgType>(call: string, args: ArgType)
+  public InvokeMethod<ArgType>(call: string, args?: ArgType)
   {
       // if no one subscribed, early return
     if (!this._methods.filter(m => m.call === call)) return;

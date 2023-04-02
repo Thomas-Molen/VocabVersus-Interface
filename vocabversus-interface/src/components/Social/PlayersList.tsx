@@ -42,6 +42,9 @@ function PlayersList() {
               {player.identifier === stateContext.GetHubInfo().userInformation.identifier && <h4>{"<- you"}</h4>}
               {!player.isConnected && <MobiledataOffIcon color="warning" />}
               {(player.isReady && stateContext.GetHubInfo().game.gameState === GameState.Lobby) && <CheckIcon color="success" />}
+              {stateContext.GetHubInfo().game.gameState === GameState.Started &&
+              <h3>{`(${player.points})`}</h3>
+              }
             </div>
           );
         })}

@@ -1,0 +1,24 @@
+.character-box {
+  border: 2px solid;
+  color: #ffffffde;
+  border-color: #ffffffde;
+  border-radius: 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+}
+
+.character-text {
+  font-size: 3rem;
+}
+
+.character-success {
+    color: #02e302;
+    border-color: #02e302;
+}
+
+.character-warning {
+    color: #ffa500;
+    border-color: #ffa500;
+}

@@ -4,7 +4,7 @@ import "../GlitchText.css";
 import { CountDownContext, ICountDownContext } from "./CountDownContext";
 import { Button } from "@mui/material";
 
-type GameHubProps = {
+type CountDownProps = {
   children: React.ReactNode;
   // To improve user experience, 0timemargin is used to add a longer end period for that last second feeling, while a second in the count down is longer than a real world second
   timeMargin: number;
@@ -13,7 +13,7 @@ type GameHubProps = {
 
 let countDownLoop: number;
 // Repeat countdown, untill it passes the overflow state
-function CountDown({ children, timeMargin, simulatedSecond }: GameHubProps) {
+function CountDown({ children, timeMargin, simulatedSecond }: CountDownProps) {
   function StartCountDown(value: number) {
     if (Math.round(value) > -timeMargin) {
       setTime(value);

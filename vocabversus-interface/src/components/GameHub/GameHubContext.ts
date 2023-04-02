@@ -12,6 +12,7 @@ export interface IGameHubCommands {
   JoinGame(username: string): Promise<any>;
   SetReady(readyState: boolean): Promise<any>;
   KickPlayer(playerIdentifier: string): Promise<any>;
+  SubmitWord(word: string): Promise<any>;
 }
 
 export const GameHubCommandsContext = createContext<IGameHubCommands>({
@@ -30,6 +31,11 @@ export const GameHubCommandsContext = createContext<IGameHubCommands>({
       console.log("KickPlayer has not been set for GameHubCommandsContext")
     );
   },
+  SubmitWord: (word: string) => {
+    return new Promise<void>((resolve, reject) =>
+      console.log("SubmitWord has not been set for GameHubCommandsContext")
+    );
+  }
 });
 
 export const GameHubEventsContext = createContext<GameHubEventHandler>(
