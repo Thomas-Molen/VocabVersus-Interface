@@ -1,26 +1,31 @@
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect } from "react";
 import Title from "../Title";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 import PlayersList from "../Social/PlayersList";
 import ReadyButton from "./ReadyButton";
-import { GameHubEventsContext, GameHubStatesContext } from "../GameHub/GameHubContext";
+import {
+  EventHandlerContext,
+  GameHubStatesContext,
+} from "../GameHub/GameHubContext";
 import { GameState } from "../models/GameState";
-import { CountDownContext } from "./CountDownContext";
-import { Button } from "@mui/material";
-import Character from "./Character";
 import WordInput from "./WordInput";
+import FeedbackMessage from "./FeedbackMessage";
+import CharacterDisplay from "./CharacterDisplay";
 
 function GameInterface() {
   const stateContext = useContext(GameHubStatesContext);
-  const countDownContext = useContext(CountDownContext);
-  const eventHandler = useContext(GameHubEventsContext);
+  const eventHandler = useContext(EventHandlerContext);
   const [lastWord, setLastWord] = useState("");
 
   useEffect(() => {
     // reset lastword when a new round starts
-    eventHandler.On("start-round", () => setLastWord(""));
-  }, [])
+    eventHandler.On(
+      "start-round",
+      () => setLastWord(""),
+      "game-interface-clear-word-feedback"
+    );
+  }, []);
 
   return (
     <>
@@ -48,28 +53,22 @@ function GameInterface() {
           )}
           {stateContext.GetHubInfo().game.gameState === GameState.Started && (
             <>
+              <FeedbackMessage />
               <Stack
                 direction="row"
                 justifyContent="center"
                 alignItems="center"
                 spacing={6}
               >
-                {stateContext
-                  .GetHubInfo()
-                  .game.rounds.at(-1)
-                  ?.requiredCharacters.map((char, i) => {
-                    return (
-                      <Character
-                        character={char.toUpperCase()}
-                        key={i}
-                        wordToCompare={lastWord}
-                      />
-                    );
-                  })}
+                <CharacterDisplay
+                  characters={stateContext.GetHubInfo().game.rounds.at(-1)?.requiredCharacters ?? []}
+                  wordToCompare={lastWord}
+                />
               </Stack>
-              {!stateContext.GetHubInfo().game.rounds.at(-1)?.isCompletedByPlayer && (
-                <WordInput onSubmit={(word) => setLastWord(word)} />
-              )}
+              {!stateContext.GetHubInfo().game.rounds.at(-1)
+                ?.isCompletedByPlayer && (
+                  <WordInput onSubmit={(word) => setLastWord(word)} />
+                )}
             </>
           )}
         </Stack>

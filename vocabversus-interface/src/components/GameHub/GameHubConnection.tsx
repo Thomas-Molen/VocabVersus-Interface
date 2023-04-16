@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, createContext } from 'react';
 import {
   HubConnectionBuilder,
   LogLevel,
@@ -7,8 +7,8 @@ import {
 } from "@microsoft/signalr";
 import { useNavigate } from "react-router-dom";
 import {
+  EventHandlerContext,
   GameHubCommandsContext,
-  GameHubEventsContext,
   GameHubStatesContext,
   IGameHubCommands,
   IGameHubStates,
@@ -28,7 +28,7 @@ import { GameState } from "../models/GameState";
 import { CountDownContext } from "../GamePlay/CountDownContext";
 import { GameRound } from "../models/GameRound";
 import { ReJoinGameResponse } from "./responses/ConnectionResponses";
-import { GameHubEventHandler } from "../../utility/GameHubEventsHandler";
+import { GameHubEventHandler } from "../../utility/GameHubEventHandler";
 
 type GameHubProps = {
   children: React.ReactNode;
@@ -37,8 +37,8 @@ type GameHubProps = {
 function GameHubConnection({ children }: GameHubProps) {
   const preLoaderContext = useContext(PreLoaderContext);
   const countDownContext = useContext(CountDownContext);
+  const eventHandler = useContext(EventHandlerContext);
 
-  const eventHandler = new GameHubEventHandler();
   const [user, setUser] = useState<User>(new User(""));
   // Get the gameId from URI
   const [game, setGame] = useState<Game>(
@@ -118,9 +118,7 @@ function GameHubConnection({ children }: GameHubProps) {
 
       // register hub callbacks
       // User connection
-      hubConnection.on(
-        "UserJoined",
-        (username: string, userIdentifier: string) =>
+      hubConnection.on("UserJoined", (username: string, userIdentifier: string) =>
           setPlayers((prevPlayers) => [
             ...prevPlayers,
             new Player(username, userIdentifier),
@@ -167,6 +165,7 @@ function GameHubConnection({ children }: GameHubProps) {
         }
       );
       hubConnection.on("SubmitResult", (submitInfo: SubmitResponse) => {
+        eventHandler.InvokeMethod<boolean>("display-evaluate-feedback", submitInfo.isCorrect);
         if (submitInfo.isCorrect) {
           setGame((game) => {
             let latestGameRound = game.rounds.at(-1);
@@ -266,10 +265,10 @@ function GameHubConnection({ children }: GameHubProps) {
     <div id="gamehub">
       <GameHubCommandsContext.Provider value={commands}>
         <GameHubStatesContext.Provider value={states}>
-          <GameHubEventsContext.Provider value={eventHandler}>
+          <EventHandlerContext.Provider value={eventHandler}>
             {showRegistration && <GameHubRegistration />}
             {children}
-          </GameHubEventsContext.Provider>
+          </EventHandlerContext.Provider>
         </GameHubStatesContext.Provider>
       </GameHubCommandsContext.Provider>
     </div>
