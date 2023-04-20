@@ -4,6 +4,7 @@ import {
   HubConnectionBuilder,
   LogLevel,
   HubConnectionState,
+  IHttpConnectionOptions
 } from "@microsoft/signalr";
 import { useNavigate } from "react-router-dom";
 import {
@@ -46,7 +47,7 @@ function GameHubConnection({ children }: GameHubProps) {
   );
   const [hubConnection] = useState(
     new HubConnectionBuilder()
-      .withUrl(`${import.meta.env.VITE_GAME_HUB_BASE_URL}game`)
+      .withUrl(`${import.meta.env.VITE_GAME_HUB_BASE_URL}game`, {withCredentials: false})
       .configureLogging(LogLevel.Information)
       .build()
   );
