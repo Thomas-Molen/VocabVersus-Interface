@@ -17,7 +17,7 @@ function WordInput({ onSubmit }: WordInputProps) {
   return (
     <Paper
       sx={{
-        p: "2px 4px",
+        p: "2px 0px",
         width: "100%",
         maxWidth: "400px",
       }}

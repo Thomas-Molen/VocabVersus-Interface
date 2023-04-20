@@ -55,10 +55,10 @@ function GameInterface() {
             <>
               <FeedbackMessage />
               <Stack
-                direction="row"
+                direction={{ xs: 'column', xsm: 'row' }}
+                spacing={{ xs: 3, xsm: 3, md: 5 }}
                 justifyContent="center"
                 alignItems="center"
-                spacing={6}
               >
                 <CharacterDisplay
                   characters={stateContext.GetHubInfo().game.rounds.at(-1)?.requiredCharacters ?? []}

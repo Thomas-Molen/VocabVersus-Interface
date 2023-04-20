@@ -13,10 +13,27 @@ import PreLoader from "./components/PreLoader";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CountDown from "./components/GamePlay/CountDown";
 
+// set custom theming overrides
+declare module '@mui/material/styles' {
+  interface BreakpointOverrides {
+    xsm: true;
+  }
+}
+
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
   },
+  breakpoints: {
+    values:{
+      xs: 0,
+      xsm: 300,
+      sm: 600,
+      md: 900,
+      lg: 1200,
+      xl: 1536,
+    }
+  }
 });
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
