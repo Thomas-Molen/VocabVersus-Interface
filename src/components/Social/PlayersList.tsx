@@ -47,9 +47,9 @@ function PlayersList() {
         open={showMobileList}
         onClose={() => setMobileShowList(false)}
         onOpen={() => setMobileShowList(true)}
-      // Disable discovery for platform compatibility (IOS swipe features) and backdrop transition for performance on low powered devices
-      // disableDiscovery={true}
-      // disableBackdropTransition={true}
+        // Disable discovery for platform compatibility (IOS swipe features) and backdrop transition for performance on low powered devices
+        disableDiscovery={true}
+        disableBackdropTransition={true}
       >
         {list(stateContext.GetPlayers())}
       </SwipeableDrawer>
@@ -60,7 +60,7 @@ function PlayersList() {
         onClick={() => setMobileShowList(true)}
       >
         <MenuOpenIcon
-          sx={{WebkitTransform: "scaleX(-1)", transform: "scaleX(-1)"}}
+          sx={{ WebkitTransform: "scaleX(-1)", transform: "scaleX(-1)" }}
           htmlColor={"#ffffffde"}
           fontSize="large" />
       </IconButton>
