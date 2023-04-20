@@ -16,3 +16,5 @@ RUN npm run build
 FROM nginx
 # Copy the build output from the previous image to the nginx html dir
 COPY --from=build /app/dist /usr/share/nginx/html
+# Add nginx configuration to allow custom routing
+COPY --from=build /app/vocabversus-nginx.conf /etc/nginx/conf.d/vocabversus-nginx.conf
