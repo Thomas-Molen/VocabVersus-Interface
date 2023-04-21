@@ -12,6 +12,7 @@ import NotFound from "./components/NotFound";
 import PreLoader from "./components/PreLoader";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CountDown from "./components/GamePlay/CountDown";
+import { Helmet } from "react-helmet";
 
 // set custom theming overrides
 declare module '@mui/material/styles' {
@@ -25,7 +26,7 @@ const darkTheme = createTheme({
     mode: "dark",
   },
   breakpoints: {
-    values:{
+    values: {
       xs: 0,
       xsm: 300,
       sm: 600,
@@ -44,14 +45,26 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
           <Route
             path="/:gameid"
             element={
-              <CountDown timeMargin={1.5} simulatedSecond={1150}>
-                <GameHubConnection>
-                  <GameInterface />
-                </GameHubConnection>
-              </CountDown>
+              <>
+                <Helmet>
+                  <meta content="You have been challenged ⚔️" property="og:description" />
+                </Helmet>
+                <CountDown timeMargin={1.5} simulatedSecond={1150}>
+                  <GameHubConnection>
+                    <GameInterface />
+                  </GameHubConnection>
+                </CountDown>
+              </>
             }
           />
-          <Route path="*" element={<NotFound />} />
+          <Route path="*" element={
+            <>
+              <Helmet>
+                <meta content="Online word party game, compete with friends, show who's the best!" property="og:description" />
+              </Helmet>
+              <NotFound />
+            </>
+          } />
         </Routes>
       </Router>
     </PreLoader>
