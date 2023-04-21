@@ -48,5 +48,5 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
             app-name: 'vocabversus'
-            publish-profile: ${{ secrets.AzureAppService_PublishProfile_a733e04350aa4f3c987e31928430a1e9 }}
+            publish-profile: ${{ secrets.AZURE_APPSERVICE_PUBLISHPROFILE }}
             images: 'index.docker.io/${{ secrets.DOCKERHUB_USERNAME }}/vocabversus-interface:latest'
