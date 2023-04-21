@@ -22,6 +22,7 @@ function PlayersList() {
           display: "flex",
           alignItems: "center",
           cursor: "pointer",
+          paddingRight: "5px"
         }}
         onClick={() => {
           setSelectedPlayer(player);
