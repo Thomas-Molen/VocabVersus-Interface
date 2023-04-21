@@ -42,6 +42,12 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <PreLoader>
       <Router>
         <Routes>
+          <Route path="/test" element={
+            <>
+              <h1>TEST</h1>
+              <NotFound />
+            </>
+          } />
           <Route
             path="/:gameid"
             element={

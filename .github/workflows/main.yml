@@ -37,13 +37,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-        # Setup azure credentials
-      # - name: authenticate azure
-      #   uses: azure/login@v1
-      #   with:
-      #     creds: ${{ secrets.AZURE_CREDENTIALS }}
-      
-        # Update deployed image on azure app service
       - name: deploy to azure
         uses: azure/webapps-deploy@v2
         with:
