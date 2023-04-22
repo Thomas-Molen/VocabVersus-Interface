@@ -1,4 +1,4 @@
-name: build-docker-image
+name: build-and-deploy-docker-image
 
 # Run workflow on push to main or manual trigger
 on:
