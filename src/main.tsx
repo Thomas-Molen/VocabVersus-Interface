@@ -44,7 +44,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
         <Routes>
           <Route path="/test" element={
             <>
-              <h1>TEST</h1>
+              <h1>TEST1</h1>
               <NotFound />
             </>
           } />
