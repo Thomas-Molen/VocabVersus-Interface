@@ -30,7 +30,7 @@ function WordInput({ onSubmit }: WordInputProps) {
         onSubmit={(event) => {
           event.preventDefault();
           if (word) {
-            gameHubCommandsContext.SubmitWord(word);
+            gameHubCommandsContext.SubmitWord(word.trim());
             onSubmit(word);
             setWord("");
           }
