@@ -3,7 +3,7 @@ name: build-and-deploy-docker-image
 # Run workflow on push to main or manual trigger
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "azure" ]
   workflow_dispatch:
 
 jobs:
