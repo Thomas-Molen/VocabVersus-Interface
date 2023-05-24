@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Get git functionality
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # Install vercel commands for build
       - name: Install Vercel CLI
