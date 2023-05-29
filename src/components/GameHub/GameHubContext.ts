@@ -7,14 +7,14 @@ import { User } from "../models/User";
 import { GameHubEventHandler } from "../../utility/GameHubEventHandler";
 
 export interface IGameHubCommands {
-  JoinGame(username: string): Promise<any>;
+  JoinGame(username: string, password: string | null): Promise<any>;
   SetReady(readyState: boolean): Promise<any>;
   KickPlayer(playerIdentifier: string): Promise<any>;
   SubmitWord(word: string): Promise<any>;
 }
 
 export const GameHubCommandsContext = createContext<IGameHubCommands>({
-  JoinGame: (username: string) => {
+  JoinGame: (username: string, password: string | null) => {
     return new Promise<void>((resolve, reject) =>
       console.log("JoinGame has not been set for GameHubCommandsContext")
     );

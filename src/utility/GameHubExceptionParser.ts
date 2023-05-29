@@ -4,7 +4,9 @@ export enum GameHubExceptionCode {
     UserNotFound = 200,
     UserAddFailed = 201,
     UserEditFailed = 202,
-    ActionNotAllowed = 300
+    ActionNotAllowed = 300,
+    AuthenticationRequired = 301,
+    AuthenticationFailed = 302,
 }
 
 const gameHubErrorCodeIndicator: string = import.meta.env.VITE_GAME_HUB_EXCEPTION_CODE_INDICATOR

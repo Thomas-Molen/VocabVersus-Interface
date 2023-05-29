@@ -80,6 +80,7 @@ function GameHubConnection({ children }: GameHubProps) {
                 ...game,
                 gameState: gameInfo.gameState,
                 maxPlayers: gameInfo.maxPlayerCount,
+                isPasswordProtected: gameInfo.isPasswordProtected
               });
               setUser(new User(gameInfo.personalIdentifier));
               localStorage.setItem(
@@ -215,9 +216,9 @@ function GameHubConnection({ children }: GameHubProps) {
 
   // setup all commands to be
   const commands: IGameHubCommands = {
-    JoinGame: (username) => {
+    JoinGame: (username, password) => {
       return hubConnection
-        .invoke<JoinGameResponse>("Join", game.gameId, username)
+        .invoke<JoinGameResponse>("Join", game.gameId, username, password)
         .then((gameInfo) => {
           // Go through all already joined players, and invoke the player joined event for them
           Object.keys(gameInfo.players).map((key) =>
@@ -267,7 +268,7 @@ function GameHubConnection({ children }: GameHubProps) {
       <GameHubCommandsContext.Provider value={commands}>
         <GameHubStatesContext.Provider value={states}>
           <EventHandlerContext.Provider value={eventHandler}>
-            {showRegistration && <GameHubRegistration />}
+            {showRegistration && <GameHubRegistration showPassword={game.isPasswordProtected} />}
             {children}
           </EventHandlerContext.Provider>
         </GameHubStatesContext.Provider>

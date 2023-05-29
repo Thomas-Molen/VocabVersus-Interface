@@ -26,6 +26,7 @@ export type CheckGameResponse = {
   maxPlayerCount: number;
   personalIdentifier: string;
   canReconnect: boolean;
+  isPasswordProtected: boolean;
 }
 
 export type SubmitResponse = {
