@@ -7,6 +7,8 @@ import PlayerDetails from "./PlayerDetails";
 import { Player } from "../models/Player";
 import { GameState } from "../models/GameState";
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
+import ShareButton from "./ShareButton";
+import Divider from "@mui/material/Divider";
 
 function PlayersList() {
   const stateContext = useContext(GameHubStatesContext);
@@ -42,6 +44,7 @@ function PlayersList() {
 
   return (
     <>
+      {/* Desktop view */}
       <SwipeableDrawer
         sx={{ display: { xs: 'block', sm: 'none' } }}
         anchor="left"
@@ -52,8 +55,12 @@ function PlayersList() {
         disableDiscovery={true}
         disableBackdropTransition={true}
       >
+        <ShareButton url={window.location.href} />
+        <Divider />
         {list(stateContext.GetPlayers())}
       </SwipeableDrawer>
+
+      {/* Mobile view */}
       <IconButton
         color="default"
         sx={{ p: "10px", display: { xs: 'block', sm: 'none' }, position: "absolute" }}
@@ -70,8 +77,12 @@ function PlayersList() {
         sx={{ display: { xs: 'none', sm: 'block' } }}
         open
       >
+        <ShareButton url={window.location.href} />
+        <Divider />
         {list(stateContext.GetPlayers())}
       </Drawer>
+
+      {/* Player details */}
       {showDetails &&
         <PlayerDetails player={selectedPlayer} showModal={true} onClose={() => setShowDetails(false)} />
       }
