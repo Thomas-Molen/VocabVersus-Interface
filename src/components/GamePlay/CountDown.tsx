@@ -51,11 +51,11 @@ function CountDown({ children, timeMargin, simulatedSecond }: CountDownProps) {
         {Math.floor(time) > -timeMargin && (
           <>
             {Math.round(time) <= 0 ? (
-              <h1 title="0" className="highlight-count text-glitch">
+              <span title="0" className="highlight-count text-glitch">
                 0
-              </h1>
+              </span>
             ) : (
-              <h1 className="">{Math.round(time)}</h1>
+              <span className="">{Math.round(time)}</span>
             )}
           </>
         )}
