@@ -8,9 +8,10 @@ import { GameHubCommandsContext } from "../GameHub/GameHubContext";
 
 type WordInputProps = {
   onSubmit(word: string): void;
+  visible?: boolean;
 };
 
-function WordInput({ onSubmit }: WordInputProps) {
+function WordInput({ onSubmit, visible = true }: WordInputProps) {
   const gameHubCommandsContext = useContext(GameHubCommandsContext);
   const [word, setWord] = useState("");
 
@@ -20,6 +21,7 @@ function WordInput({ onSubmit }: WordInputProps) {
         p: "2px 0px",
         width: "100%",
         maxWidth: "400px",
+        visibility: visible ? "initial" : "hidden"
       }}
     >
       <form
