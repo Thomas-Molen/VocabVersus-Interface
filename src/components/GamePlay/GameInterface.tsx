@@ -65,7 +65,7 @@ function GameInterface() {
                   wordToCompare={lastWord}
                 />
               </Stack>
-              <WordInput visible={!stateContext.GetHubInfo().game.rounds.at(-1)?.isCompletedByPlayer} onSubmit={(word) => setLastWord(word)} />
+              <WordInput visible={!stateContext.GetHubInfo().game.rounds.at(-1)?.isCompletedByPlayer} autoFocus onSubmit={(word) => setLastWord(word)} />
             </>
           )}
         </Stack>

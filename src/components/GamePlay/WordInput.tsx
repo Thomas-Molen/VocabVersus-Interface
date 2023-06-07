@@ -3,17 +3,22 @@ import InputBase from "@mui/material/InputBase";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import SendIcon from "@mui/icons-material/Send";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { GameHubCommandsContext } from "../GameHub/GameHubContext";
 
 type WordInputProps = {
   onSubmit(word: string): void;
   visible?: boolean;
+  autoFocus?: boolean;
 };
 
-function WordInput({ onSubmit, visible = true }: WordInputProps) {
+function WordInput({ onSubmit, visible = true, autoFocus = true }: WordInputProps) {
   const gameHubCommandsContext = useContext(GameHubCommandsContext);
   const [word, setWord] = useState("");
+
+  useEffect(() => {
+    if(visible && autoFocus) document.getElementById("word-input")?.focus();
+  }, [visible]);
 
   return (
     <Paper
@@ -39,10 +44,10 @@ function WordInput({ onSubmit, visible = true }: WordInputProps) {
         }}
       >
         <InputBase
-          autoFocus
+          autoFocus={autoFocus}
           sx={{ ml: 1, flex: 1 }}
           placeholder="Insert Word"
-          inputProps={{ "aria-label": "insert word" }}
+          inputProps={{ "aria-label": "insert word", "id": "word-input" }}
           value={word}
           onChange={(e) => setWord(e.target.value)}
         />
