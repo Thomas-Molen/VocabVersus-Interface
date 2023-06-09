@@ -9,6 +9,7 @@ import { GameState } from "../models/GameState";
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import ShareButton from "./ShareButton";
 import Divider from "@mui/material/Divider";
+import PlayerScore from "./PlayerScore";
 
 function PlayersList() {
   const stateContext = useContext(GameHubStatesContext);
@@ -36,7 +37,7 @@ function PlayersList() {
         {!player.isConnected && <MobiledataOffIcon color="warning" />}
         {(player.isReady && stateContext.GetHubInfo().game.gameState === GameState.Lobby) && <CheckIcon color="success" />}
         {stateContext.GetHubInfo().game.gameState === GameState.Started &&
-          <h3>{`(${player.points})`}</h3>
+          <PlayerScore score={player.points}/>
         }
       </div>
     );

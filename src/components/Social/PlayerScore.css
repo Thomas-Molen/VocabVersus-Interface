@@ -1,0 +1,15 @@
+.score {
+  margin-left: 0.3rem;
+}
+
+.static {
+  color: #ffffffde;
+}
+
+.increasing {
+  color: #02e302;
+}
+
+.decreasing {
+  color: #ff5d5d;
+}
