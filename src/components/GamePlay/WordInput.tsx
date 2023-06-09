@@ -47,7 +47,7 @@ function WordInput({ onSubmit, visible = true, autoFocus = true }: WordInputProp
           autoFocus={autoFocus}
           sx={{ ml: 1, flex: 1 }}
           placeholder="Insert Word"
-          inputProps={{ "aria-label": "insert word", "id": "word-input" }}
+          inputProps={{ "aria-label": "insert word", "id": "word-input", "autocomplete": "off" }}
           value={word}
           onChange={(e) => setWord(e.target.value)}
         />
